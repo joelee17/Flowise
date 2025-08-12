@@ -1,61 +1,7 @@
 import { Tool } from '@langchain/core/tools'
-import { ICommonObject, IDatabaseEntity, INode, INodeData, INodeOptionsValue, INodeParams } from '../../../../src/Interface'
+import { ICommonObject, INode, INodeData, INodeOptionsValue, INodeParams } from '../../../../src/Interface'
+import { getCredentialData, getCredentialParam } from '../../../../src/utils'
 import { MCPToolkit } from '../core'
-import { getVars, prepareSandboxVars } from '../../../../src/utils'
-import { DataSource } from 'typeorm'
-import hash from 'object-hash'
-
-const workdayMcpServerConfig = `{
-    "url": "https://your-workday-agent-url.com/mcp",
-    "headers": {
-        "Authorization": "Bearer {{$vars.workdayToken}}",
-        "Content-Type": "application/json"
-    }
-}`
-
-const workdayHowToUseCode = `
-You can use variables in the Workday MCP Server Config with double curly braces \`{{ }}\` and prefix \`$vars.<variableName>\`. 
-
-For example, you have a variable called "workdayToken":
-\`\`\`json
-{
-    "url": "https://your-workday-agent-url.com/mcp",
-    "headers": {
-        "Authorization": "Bearer {{$vars.workdayToken}}",
-        "Content-Type": "application/json"
-    }
-}
-\`\`\`
-
-For Workday API integration with environment variables:
-\`\`\`json
-{
-    "command": "node",
-    "args": ["workday-mcp-server.js"],
-    "env": {
-        "WORKDAY_BASE_URL": "{{$vars.workdayBaseUrl}}",
-        "WORKDAY_TENANT": "{{$vars.workdayTenant}}",
-        "WORKDAY_BEARER_TOKEN": "{{$vars.workdayBearerToken}}"
-    }
-}
-\`\`\`
-
-For Docker-based Workday MCP server:
-\`\`\`json
-{
-    "command": "docker",
-    "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e", "WORKDAY_BEARER_TOKEN={{$vars.workdayBearerToken}}",
-        "-e", "WORKDAY_BASE_URL={{$vars.workdayBaseUrl}}",
-        "-e", "WORKDAY_TENANT={{$vars.workdayTenant}}",
-        "your-workday-mcp-image"
-    ]
-}
-\`\`\`
-`
 
 class Workday_MCP implements INode {
     label: string
@@ -71,32 +17,83 @@ class Workday_MCP implements INode {
     inputs: INodeParams[]
 
     constructor() {
-        this.label = 'Workday MCP Server'
+        this.label = 'Workday MCP'
         this.name = 'workdayMCP'
         this.version = 1.0
         this.type = 'Workday MCP Tool'
-        this.icon = 'workdayMCP.png'
+        this.icon = 'workday.png'
         this.category = 'Tools (MCP)'
-        this.description = 'Workday MCP Server for HR operations and data access'
-        this.documentation = 'https://docs.flowiseai.com/tutorials/tools-and-mcp'
+        this.description = 'MCP Server for Workday (remote HTTP streamable)'
+        this.documentation = 'https://github.com/Workday/workday-mcp-server'
+        this.credential = {
+            label: 'Workday Credential',
+            name: 'token',
+            type: 'credential',
+            credentialNames: ['workdayBearerToken', 'workdayBasicAuth'],
+            description: 'Needed when using Workday MCP server with authentication'
+        }
         this.inputs = [
             {
-                label: 'Workday MCP Server Config',
-                name: 'mcpServerConfig',
-                type: 'code',
-                hideCodeExecute: true,
-                hint: {
-                    label: 'How to use',
-                    value: workdayHowToUseCode
-                },
-                placeholder: workdayMcpServerConfig,
-                warning:
-                    process.env.CUSTOM_MCP_SECURITY_CHECK === 'true'
-                        ? 'In next release, only Remote MCP with url is supported. Read more <a href="https://docs.flowiseai.com/tutorials/tools-and-mcp#streamable-http-recommended" target="_blank">here</a>'
-                        : undefined
+                label: 'MCP Server URL',
+                name: 'serverUrl',
+                type: 'string',
+                description: 'Workday MCP Server URL',
+                placeholder: 'https://mcp-workday-server.onrender.com',
+                optional: true
             },
             {
-                label: 'Available Workday Actions',
+                label: 'Bearer Token',
+                name: 'bearerToken',
+                type: 'password',
+                description: 'Workday Bearer Token for authentication',
+                optional: true
+            },
+            {
+                label: 'MCP Functional Area',
+                name: 'mcpFunctionalArea',
+                type: 'multiOptions',
+                description: 'Actions to perform',
+                options: [
+                    {
+                        label: 'All Workday Tools',
+                        name: 'allTools'
+                    },
+                    {
+                        label: 'Absence',
+                        name: 'absence'
+                    },
+                    {
+                        label: 'Benefits',
+                        name: 'benefits'
+                    },
+                    {
+                        label: 'Budgets',
+                        name: 'budgets'
+                    },
+                    {
+                        label: 'Customer Accounts',
+                        name: 'customerAccounts'
+                    },
+                    {
+                        label: 'Payroll',
+                        name: 'payroll'
+                    },
+                    {
+                        label: 'Personal Data',
+                        name: 'personalData'
+                    },
+                    {
+                        label: 'Procurement',
+                        name: 'procurement'
+                    },
+                    {
+                        label: 'Staffing',
+                        name: 'staffing'
+                    }
+                ]
+            },
+            {
+                label: 'Available Actions',
                 name: 'mcpActions',
                 type: 'asyncMultiOptions',
                 loadMethod: 'listActions',
@@ -112,18 +109,18 @@ class Workday_MCP implements INode {
             try {
                 const toolset = await this.getTools(nodeData, options)
                 toolset.sort((a: any, b: any) => a.name.localeCompare(b.name))
-
                 return toolset.map(({ name, ...rest }) => ({
                     label: name.toUpperCase(),
                     name: name,
                     description: rest.description || name
                 }))
             } catch (error) {
+                console.error('Error listing actions:', error)
                 return [
                     {
-                        label: 'No Available Workday Actions',
+                        label: 'No Available Actions',
                         name: 'error',
-                        description: 'No available Workday actions, please check your configuration and refresh'
+                        description: 'No available actions, please check your MCP server URL and credentials, then refresh.'
                     }
                 ]
             }
@@ -132,157 +129,50 @@ class Workday_MCP implements INode {
 
     async init(nodeData: INodeData, _: string, options: ICommonObject): Promise<any> {
         const tools = await this.getTools(nodeData, options)
-
         const _mcpActions = nodeData.inputs?.mcpActions
         let mcpActions = []
         if (_mcpActions) {
             try {
                 mcpActions = typeof _mcpActions === 'string' ? JSON.parse(_mcpActions) : _mcpActions
             } catch (error) {
-                console.error('Error parsing Workday MCP actions:', error)
+                console.error('Error parsing mcp actions:', error)
             }
         }
-
         return tools.filter((tool: any) => mcpActions.includes(tool.name))
     }
 
     async getTools(nodeData: INodeData, options: ICommonObject): Promise<Tool[]> {
-        const mcpServerConfig = nodeData.inputs?.mcpServerConfig as string
-        if (!mcpServerConfig) {
-            throw new Error('Workday MCP Server Config is required')
+        const credentialData = await getCredentialData(nodeData.credential ?? '', options)
+        const serverUrl = nodeData.inputs?.serverUrl || getCredentialParam('suvHostname', credentialData, nodeData) || 'https://mcp-workday-server.onrender.com'
+        const mcpUrl = serverUrl + "/mcp"
+
+        if (!mcpUrl) {
+            throw new Error('Missing MCP Server URL')
         }
 
-        let sandbox: ICommonObject = {}
+        // Determine auth method from credentials
+        let serverParams: any = {
+            url: mcpUrl,
+            headers: {}
+        }
+        // Get Bearer token from node input (from agent flow) or credential store
+        const bearerToken = nodeData.inputs?.bearerToken || getCredentialParam('token', credentialData, nodeData)
+        const username = getCredentialParam('username', credentialData, nodeData)
+        const password = getCredentialParam('password', credentialData, nodeData)
 
-        if (mcpServerConfig.includes('$vars')) {
-            const appDataSource = options.appDataSource as DataSource
-            const databaseEntities = options.databaseEntities as IDatabaseEntity
-
-            const variables = await getVars(appDataSource, databaseEntities, nodeData, options)
-            sandbox['$vars'] = prepareSandboxVars(variables)
+        if (bearerToken) {
+            serverParams.headers['Authorization'] = `Bearer ${bearerToken}`
+        } else if (username && password) {
+            serverParams.headers['Authorization'] = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64')
+        } else {
+            throw new Error('Missing credentials: provide Bearer token from flow/credentials OR username/password from credentials')
         }
 
-        const workspaceId = options?.searchOptions?.workspaceId?._value || options?.workspaceId
-
-        let canonicalConfig
-        try {
-            canonicalConfig = JSON.parse(mcpServerConfig)
-        } catch (e) {
-            canonicalConfig = mcpServerConfig
-        }
-
-        const cacheKey = hash({ workspaceId, canonicalConfig, sandbox })
-
-        if (options.cachePool) {
-            const cachedResult = await options.cachePool.getMCPCache(cacheKey)
-            if (cachedResult) {
-                return cachedResult.tools
-            }
-        }
-
-        try {
-            let serverParams
-            if (typeof mcpServerConfig === 'object') {
-                serverParams = substituteVariablesInObject(mcpServerConfig, sandbox)
-            } else if (typeof mcpServerConfig === 'string') {
-                const substitutedString = substituteVariablesInString(mcpServerConfig, sandbox)
-                const serverParamsString = convertToValidJSONString(substitutedString)
-                serverParams = JSON.parse(serverParamsString)
-            }
-
-            // Compatible with stdio and SSE - prefer SSE for Workday remote connections
-            let toolkit: MCPToolkit
-            if (process.env.CUSTOM_MCP_PROTOCOL === 'sse') {
-                toolkit = new MCPToolkit(serverParams, 'sse')
-            } else if (serverParams?.command === undefined) {
-                toolkit = new MCPToolkit(serverParams, 'sse')
-            } else {
-                toolkit = new MCPToolkit(serverParams, 'stdio')
-            }
-
-            await toolkit.initialize()
-
-            const tools = toolkit.tools ?? []
-
-            if (options.cachePool) {
-                await options.cachePool.addMCPCache(cacheKey, { toolkit, tools })
-            }
-
-            return tools as Tool[]
-        } catch (error) {
-            throw new Error(`Invalid Workday MCP Server Config: ${error}`)
-        }
-    }
-}
-
-function substituteVariablesInObject(obj: any, sandbox: any): any {
-    if (typeof obj === 'string') {
-        // Replace variables in string values
-        return substituteVariablesInString(obj, sandbox)
-    } else if (Array.isArray(obj)) {
-        // Recursively process arrays
-        return obj.map((item) => substituteVariablesInObject(item, sandbox))
-    } else if (obj !== null && typeof obj === 'object') {
-        // Recursively process object properties
-        const result: any = {}
-        for (const [key, value] of Object.entries(obj)) {
-            result[key] = substituteVariablesInObject(value, sandbox)
-        }
-        return result
-    }
-    // Return primitive values as-is
-    return obj
-}
-
-function substituteVariablesInString(str: string, sandbox: any): string {
-    // Use regex to find {{$variableName.property}} patterns and replace with sandbox values
-    return str.replace(/\{\{\$([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*)\}\}/g, (match, variablePath) => {
-        try {
-            // Split the path into parts (e.g., "vars.testvar1" -> ["vars", "testvar1"])
-            const pathParts = variablePath.split('.')
-
-            // Start with the sandbox object
-            let current = sandbox
-
-            // Navigate through the path
-            for (const part of pathParts) {
-                // For the first part, check if it exists with $ prefix
-                if (current === sandbox) {
-                    const sandboxKey = `$${part}`
-                    if (Object.keys(current).includes(sandboxKey)) {
-                        current = current[sandboxKey]
-                    } else {
-                        // If the key doesn't exist, return the original match
-                        return match
-                    }
-                } else {
-                    // For subsequent parts, access directly
-                    if (current && typeof current === 'object' && part in current) {
-                        current = current[part]
-                    } else {
-                        // If the property doesn't exist, return the original match
-                        return match
-                    }
-                }
-            }
-
-            // Return the resolved value, converting to string if necessary
-            return typeof current === 'string' ? current : JSON.stringify(current)
-        } catch (error) {
-            // If any error occurs during resolution, return the original match
-            console.warn(`Error resolving variable ${match}:`, error)
-            return match
-        }
-    })
-}
-
-function convertToValidJSONString(inputString: string) {
-    try {
-        const jsObject = Function('return ' + inputString)()
-        return JSON.stringify(jsObject, null, 2)
-    } catch (error) {
-        console.error('Error converting to JSON:', error)
-        return ''
+        // Use SSE for remote HTTP MCP servers
+        const toolkit = new MCPToolkit(serverParams, 'sse')
+        await toolkit.initialize()
+        const tools = toolkit.tools ?? []
+        return tools as Tool[]
     }
 }
 
