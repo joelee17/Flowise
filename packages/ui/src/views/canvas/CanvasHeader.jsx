@@ -13,6 +13,8 @@ import { IconSettings, IconChevronLeft, IconDeviceFloppy, IconPencil, IconCheck,
 // project imports
 import Settings from '@/views/settings'
 import SaveChatflowDialog from '@/ui-component/dialog/SaveChatflowDialog'
+import WorkdayRegistrationDialog from '@/ui-component/dialog/WorkdayRegistrationDialog'
+import dubLogo from '@/assets/images/dub.png'
 import APICodeDialog from '@/views/chatflows/APICodeDialog'
 import ViewMessagesDialog from '@/ui-component/dialog/ViewMessagesDialog'
 import ChatflowConfigurationDialog from '@/ui-component/dialog/ChatflowConfigurationDialog'
@@ -58,6 +60,8 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, isAgentflowV2, handleSaveFlow, 
 
     const [exportAsTemplateDialogOpen, setExportAsTemplateDialogOpen] = useState(false)
     const [exportAsTemplateDialogProps, setExportAsTemplateDialogProps] = useState({})
+    const [workdayRegistrationDialogOpen, setWorkdayRegistrationDialogOpen] = useState(false)
+    const [workdayRegistrationDialogProps, setWorkdayRegistrationDialogProps] = useState({})
     const enqueueSnackbar = (...args) => dispatch(enqueueSnackbarAction(...args))
     const closeSnackbar = (...args) => dispatch(closeSnackbarAction(...args))
 
@@ -218,10 +222,35 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, isAgentflowV2, handleSaveFlow, 
         else setFlowDialogOpen(true)
     }
 
+    const onWorkdayRegistrationClick = () => {
+        setWorkdayRegistrationDialogProps({
+            title: 'Register with Agent System of Record',
+            confirmButtonName: 'Register',
+            cancelButtonName: 'Cancel'
+        })
+        setWorkdayRegistrationDialogOpen(true)
+    }
+
     const onConfirmSaveName = (flowName) => {
         setFlowDialogOpen(false)
         setSavePermission(isAgentCanvas ? 'agentflows:update' : 'chatflows:update')
         handleSaveFlow(flowName)
+    }
+
+    const onWorkdayRegistrationRegister = () => {
+        setWorkdayRegistrationDialogOpen(false)
+        // TODO: Add actual registration logic here
+        enqueueSnackbar({
+            message: 'Successfully registered with Agent System of Record',
+            options: {
+                key: new Date().getTime() + Math.random(),
+                variant: 'success'
+            }
+        })
+    }
+
+    const onWorkdayRegistrationCancel = () => {
+        setWorkdayRegistrationDialogOpen(false)
     }
 
     useEffect(() => {
@@ -432,6 +461,35 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, isAgentflowV2, handleSaveFlow, 
                             </Avatar>
                         </ButtonBase>
                     </Available>
+                    <ButtonBase title='Register with Agent System of Record' sx={{ borderRadius: '50%', mr: 2 }}>
+                        <Avatar
+                            variant='rounded'
+                            sx={{
+                                ...theme.typography.commonAvatar,
+                                ...theme.typography.mediumAvatar,
+                                transition: 'all .2s ease-in-out',
+                                background: '#1F4788',
+                                color: '#FFFFFF',
+                                '&:hover': {
+                                    background: '#163A6D',
+                                    color: '#FFFFFF'
+                                }
+                            }}
+                            color='inherit'
+                            onClick={onWorkdayRegistrationClick}
+                        >
+                            <img 
+                                src={dubLogo} 
+                                alt="Dub" 
+                                style={{ 
+                                    width: '20px', 
+                                    height: '20px',
+                                    objectFit: 'contain',
+                                    filter: 'brightness(0) invert(1)'
+                                }} 
+                            />
+                        </Avatar>
+                    </ButtonBase>
                     <ButtonBase ref={settingsRef} title='Settings' sx={{ borderRadius: '50%' }}>
                         <Avatar
                             variant='rounded'
@@ -471,6 +529,12 @@ const CanvasHeader = ({ chatflow, isAgentCanvas, isAgentflowV2, handleSaveFlow, 
                 }}
                 onCancel={() => setFlowDialogOpen(false)}
                 onConfirm={onConfirmSaveName}
+            />
+            <WorkdayRegistrationDialog
+                show={workdayRegistrationDialogOpen}
+                dialogProps={workdayRegistrationDialogProps}
+                onCancel={onWorkdayRegistrationCancel}
+                onRegister={onWorkdayRegistrationRegister}
             />
             {apiDialogOpen && <APICodeDialog show={apiDialogOpen} dialogProps={apiDialogProps} onCancel={() => setAPIDialogOpen(false)} />}
             <ViewMessagesDialog

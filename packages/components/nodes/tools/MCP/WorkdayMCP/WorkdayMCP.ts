@@ -21,7 +21,7 @@ class Workday_MCP implements INode {
         this.name = 'workdayMCP'
         this.version = 1.0
         this.type = 'Workday MCP Tool'
-        this.icon = 'workday.png'
+        this.icon = 'workdayMCP.png'
         this.category = 'Tools (MCP)'
         this.description = 'MCP Server for Workday (remote HTTP streamable)'
         this.documentation = 'https://github.com/Workday/workday-mcp-server'
@@ -33,21 +33,6 @@ class Workday_MCP implements INode {
             description: 'Needed when using Workday MCP server with authentication'
         }
         this.inputs = [
-            {
-                label: 'MCP Server URL',
-                name: 'serverUrl',
-                type: 'string',
-                description: 'Workday MCP Server URL',
-                placeholder: 'https://mcp-workday-server.onrender.com',
-                optional: true
-            },
-            {
-                label: 'Bearer Token',
-                name: 'bearerToken',
-                type: 'password',
-                description: 'Workday Bearer Token for authentication',
-                optional: true
-            },
             {
                 label: 'MCP Functional Area',
                 name: 'mcpFunctionalArea',
@@ -89,6 +74,10 @@ class Workday_MCP implements INode {
                     {
                         label: 'Staffing',
                         name: 'staffing'
+                    },
+                    {
+                        label: 'Time Tracking',
+                        name: 'timeTracking'
                     }
                 ]
             },
@@ -143,8 +132,7 @@ class Workday_MCP implements INode {
 
     async getTools(nodeData: INodeData, options: ICommonObject): Promise<Tool[]> {
         const credentialData = await getCredentialData(nodeData.credential ?? '', options)
-        const serverUrl = nodeData.inputs?.serverUrl || getCredentialParam('suvHostname', credentialData, nodeData) || 'https://mcp-workday-server.onrender.com'
-        const mcpUrl = serverUrl + "/mcp"
+        const mcpUrl = getCredentialParam('suvHostname', credentialData, nodeData) + "/mcp"
 
         if (!mcpUrl) {
             throw new Error('Missing MCP Server URL')
