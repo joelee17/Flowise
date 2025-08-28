@@ -14,8 +14,7 @@ import {
     IconNote,
     IconWorld,
     IconRelationOneToManyFilled,
-    IconVectorBezier2,
-    IconBuildingBank
+    IconVectorBezier2
 } from '@tabler/icons-react'
 
 export const gridSpacing = 3
