@@ -579,7 +579,7 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
                                                                                                 width: 50,
                                                                                                 height: 50,
                                                                                                 borderRadius: '50%',
-                                                                                                backgroundColor: 'white'
+                                                                                                backgroundColor: node.name === 'workdayAgentGateway' ? '#0f2e66' : 'white'
                                                                                             }}
                                                                                         >
                                                                                             <img
