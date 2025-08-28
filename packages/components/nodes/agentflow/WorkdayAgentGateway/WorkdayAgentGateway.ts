@@ -63,7 +63,7 @@ class WorkdayAgentGateway_Agentflow implements INode {
             label: 'Workday Credential',
             name: 'credential',
             type: 'credential',
-            credentialNames: ['httpBasicAuth', 'httpBearerToken', 'httpApiKey'],
+            credentialNames: ['workdayBasicAuth', 'workdayBearerToken'],
             optional: true
         }
         this.inputs = [
@@ -258,23 +258,25 @@ class WorkdayAgentGateway_Agentflow implements INode {
             // Add credentials if provided
             const credentialData = await getCredentialData(nodeData.credential ?? '', options)
             if (credentialData && Object.keys(credentialData).length !== 0) {
-                const basicAuthUsername = getCredentialParam('basicAuthUsername', credentialData, nodeData)
-                const basicAuthPassword = getCredentialParam('basicAuthPassword', credentialData, nodeData)
-                const bearerToken = getCredentialParam('token', credentialData, nodeData)
-                const apiKeyName = getCredentialParam('key', credentialData, nodeData)
-                const apiKeyValue = getCredentialParam('value', credentialData, nodeData)
+                const workdayUsername = getCredentialParam('username', credentialData, nodeData)
+                const workdayPassword = getCredentialParam('password', credentialData, nodeData)
+                const workdayBearerToken = getCredentialParam('token', credentialData, nodeData)
+                const suvHostname = getCredentialParam('suvHostname', credentialData, nodeData)
 
                 // Determine which type of auth to use based on available credentials
-                if (basicAuthUsername || basicAuthPassword) {
-                    // Basic Auth
-                    const auth = Buffer.from(`${basicAuthUsername}:${basicAuthPassword}`).toString('base64')
+                if (workdayUsername || workdayPassword) {
+                    // Workday Basic Auth
+                    const auth = Buffer.from(`${workdayUsername}:${workdayPassword}`).toString('base64')
                     requestHeaders['Authorization'] = `Basic ${auth}`
-                } else if (bearerToken) {
-                    // Bearer Token
-                    requestHeaders['Authorization'] = `Bearer ${bearerToken}`
-                } else if (apiKeyName && apiKeyValue) {
-                    // API Key in header
-                    requestHeaders[apiKeyName] = apiKeyValue
+                } else if (workdayBearerToken) {
+                    // Workday Bearer Token
+                    requestHeaders['Authorization'] = `Bearer ${workdayBearerToken}`
+                }
+
+                // Add SUV hostname if provided and not already in URL
+                if (suvHostname && !url.includes(suvHostname)) {
+                    // Store for potential use in request logic
+                    requestHeaders['X-Workday-SUV-Host'] = suvHostname
                 }
             }
 
