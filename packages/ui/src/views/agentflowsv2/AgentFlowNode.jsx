@@ -30,7 +30,7 @@ import CancelIcon from '@mui/icons-material/Cancel'
 import { baseURL, AGENTFLOW_ICONS } from '@/store/constant'
 
 // assets
-import WorkdayAgentGatewayIcon from '@/assets/images/workday-agent-gateway.png'
+import WorkdayAgentGatewayIcon from '@/assets/images/workday-agent-gateway-transparent.png'
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
     background: theme.palette.card.main,
