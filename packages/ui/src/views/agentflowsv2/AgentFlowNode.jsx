@@ -319,12 +319,12 @@ const AgentFlowNode = ({ data }) => {
                                         ...theme.typography.commonAvatar,
                                         ...theme.typography.largeAvatar,
                                         borderRadius: '15px',
-                                        backgroundColor: '#4A90E2',
+                                        backgroundColor: '#0f2e66',
                                         cursor: 'grab',
                                         display: 'flex',
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        background: '#4A90E2'
+                                        background: '#0f2e66'
                                     }}
                                 >
                                     <img
