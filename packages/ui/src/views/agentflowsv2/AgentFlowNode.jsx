@@ -310,7 +310,7 @@ const AgentFlowNode = ({ data }) => {
 
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                         <Box item style={{ width: 50 }}>
-                            {data.color && !data.icon ? (
+                            {data.color && !data.icon && data.name !== 'workdayAgentGateway' ? (
                                 <div
                                     style={{
                                         ...theme.typography.commonAvatar,
