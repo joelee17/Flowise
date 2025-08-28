@@ -29,6 +29,9 @@ import CancelIcon from '@mui/icons-material/Cancel'
 // const
 import { baseURL, AGENTFLOW_ICONS } from '@/store/constant'
 
+// assets
+import WorkdayAgentGatewayIcon from '@/assets/images/workday-agent-gateway.png'
+
 const CardWrapper = styled(MainCard)(({ theme }) => ({
     background: theme.palette.card.main,
     color: theme.darkTextPrimary,
@@ -310,7 +313,27 @@ const AgentFlowNode = ({ data }) => {
 
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                         <Box item style={{ width: 50 }}>
-                            {data.color && !data.icon && data.name !== 'workdayAgentGateway' ? (
+                            {data.name === 'workdayAgentGateway' ? (
+                                <div
+                                    style={{
+                                        ...theme.typography.commonAvatar,
+                                        ...theme.typography.largeAvatar,
+                                        borderRadius: '15px',
+                                        backgroundColor: '#4A90E2',
+                                        cursor: 'grab',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        background: '#4A90E2'
+                                    }}
+                                >
+                                    <img
+                                        style={{ width: '80%', height: '80%', objectFit: 'contain' }}
+                                        src={WorkdayAgentGatewayIcon}
+                                        alt="Workday Agent Gateway"
+                                    />
+                                </div>
+                            ) : data.color && !data.icon ? (
                                 <div
                                     style={{
                                         ...theme.typography.commonAvatar,
