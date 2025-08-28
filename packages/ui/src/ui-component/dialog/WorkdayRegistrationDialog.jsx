@@ -34,85 +34,45 @@ const WorkdayRegistrationDialog = ({ show, dialogProps, onCancel, onRegister }) 
                     />
                 </Box>
                 
-                {/* Description Section */}
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant='subtitle1' sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}>
-                        Description:
-                    </Typography>
-                    <Typography variant='body2' sx={{ mb: 2, lineHeight: 1.6, textAlign: 'left' }}>
-                        This is a helper agent for determining full sessions and heavy booth traffic. It will automatically create a new session for full sessions, as well as assign Workday personnel shifts to booths that have heavier traffic.
-                    </Typography>
-                </Box>
-
-                {/* Skills Section */}
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant='subtitle1' sx={{ fontWeight: 'bold', mb: 2, color: 'primary.main' }}>
-                        Skills:
+                {/* Agent Registration Information */}
+                <Box sx={{ mb: 4, textAlign: 'center' }}>
+                    <Typography variant='h6' sx={{ fontWeight: 'bold', mb: 3, color: 'primary.main' }}>
+                        Agent System of Record Registration
                     </Typography>
                     
-                    {/* Analyze data from Rainfocus */}
-                    <Box sx={{ mb: 2 }}>
-                        <Typography variant='body2' sx={{ fontWeight: 'medium', mb: 1 }}>
-                            • Analyze data from Rainfocus
+                    <Typography variant='body1' sx={{ mb: 3, lineHeight: 1.6, px: 2 }}>
+                        Registering this agent flow will make it available in the Workday Agent System of Record, 
+                        allowing it to be discovered and configured within your Workday tenant.
+                    </Typography>
+                    
+                    <Box sx={{ 
+                        bgcolor: 'primary.light', 
+                        p: 3, 
+                        borderRadius: 2, 
+                        border: '1px solid', 
+                        borderColor: 'primary.main',
+                        mx: 2
+                    }}>
+                        <Typography variant='subtitle1' sx={{ fontWeight: 'bold', mb: 2, color: 'primary.dark' }}>
+                            What happens when you register:
                         </Typography>
-                        <Box sx={{ ml: 2 }}>
-                            <Typography variant='body2' sx={{ fontWeight: 'medium', mb: 0.5, color: 'text.secondary' }}>
-                                Tools:
+                        <Box sx={{ textAlign: 'left' }}>
+                            <Typography variant='body2' sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                                <span style={{ marginRight: '8px', color: '#4caf50', fontWeight: 'bold' }}>✓</span>
+                                Agent becomes registered within your Workday tenant
                             </Typography>
-                            <Box sx={{ ml: 2 }}>
-                                <Typography variant='body2' sx={{ mb: 0.2, fontSize: '0.85rem' }}>
-                                    - Analyze data with LLMs
-                                </Typography>
-                                <Typography variant='body2' sx={{ mb: 0.2, fontSize: '0.85rem' }}>
-                                    - Deterministic Analysis for Booth Shifts
-                                </Typography>
-                                <Typography variant='body2' sx={{ mb: 0.2, fontSize: '0.85rem' }}>
-                                    - Deterministic Analysis for Full Sessions
-                                </Typography>
-                                <Typography variant='body2' sx={{ mb: 0.2, fontFamily: 'monospace', fontSize: '0.75rem', color: 'primary.dark' }}>
-                                    - GET Scan Information from Rainfocus (/attendeeStore/scans)
-                                </Typography>
-                            </Box>
-                        </Box>
-                    </Box>
-
-                    {/* Shift Assignment */}
-                    <Box sx={{ mb: 2 }}>
-                        <Typography variant='body2' sx={{ fontWeight: 'medium', mb: 1 }}>
-                            • Shift Assignment
-                        </Typography>
-                        <Box sx={{ ml: 2 }}>
-                            <Typography variant='body2' sx={{ fontWeight: 'medium', mb: 0.5, color: 'text.secondary' }}>
-                                Tools:
+                            <Typography variant='body2' sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                                <span style={{ marginRight: '8px', color: '#4caf50', fontWeight: 'bold' }}>✓</span>
+                                Sequence generator is created for the agent
                             </Typography>
-                            <Box sx={{ ml: 2 }}>
-                                <Typography variant='body2' sx={{ mb: 0.2, fontFamily: 'monospace', fontSize: '0.75rem', color: 'primary.dark' }}>
-                                    - Assign Work Schedule (/Time_Tracking/v44.2/Assign_Work_Schedule)
-                                </Typography>
-                                <Typography variant='body2' sx={{ mb: 0.2, fontFamily: 'monospace', fontSize: '0.75rem', color: 'primary.dark' }}>
-                                    - Notify Workers (api.workday.com/oe/labs/sendSms)
-                                </Typography>
-                            </Box>
-                        </Box>
-                    </Box>
-
-                    {/* Session Creation */}
-                    <Box sx={{ mb: 2 }}>
-                        <Typography variant='body2' sx={{ fontWeight: 'medium', mb: 1 }}>
-                            • Session Creation
-                        </Typography>
-                        <Box sx={{ ml: 2 }}>
-                            <Typography variant='body2' sx={{ fontWeight: 'medium', mb: 0.5, color: 'text.secondary' }}>
-                                Tools:
+                            <Typography variant='body2' sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                                <span style={{ marginRight: '8px', color: '#4caf50', fontWeight: 'bold' }}>✓</span>
+                                Agent becomes configurable within Workday Agent System of Record
                             </Typography>
-                            <Box sx={{ ml: 2 }}>
-                                <Typography variant='body2' sx={{ mb: 0.2, fontFamily: 'monospace', fontSize: '0.75rem', color: 'primary.dark' }}>
-                                    - Create New Session (POST /sessionCreate)
-                                </Typography>
-                                <Typography variant='body2' sx={{ mb: 0.2, fontFamily: 'monospace', fontSize: '0.75rem', color: 'primary.dark' }}>
-                                    - Notify Attendees (POST /mobileNotification)
-                                </Typography>
-                            </Box>
+                            <Typography variant='body2' sx={{ display: 'flex', alignItems: 'center' }}>
+                                <span style={{ marginRight: '8px', color: '#4caf50', fontWeight: 'bold' }}>✓</span>
+                                Enables governance and compliance tracking for this agent
+                            </Typography>
                         </Box>
                     </Box>
                 </Box>
