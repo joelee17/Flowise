@@ -113,10 +113,5 @@ export const AGENTFLOW_ICONS = [
         name: 'executeFlowAgentflow',
         icon: IconVectorBezier2,
         color: '#a3b18a'
-    },
-    {
-        name: 'workdayAgentGateway',
-        icon: IconBuildingBank,
-        color: '#F8931D'
     }
 ]
