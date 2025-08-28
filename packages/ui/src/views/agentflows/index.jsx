@@ -13,6 +13,7 @@ import AgentsEmptySVG from '@/assets/images/agents_empty.svg'
 import ConfirmDialog from '@/ui-component/dialog/ConfirmDialog'
 import { FlowListTable } from '@/ui-component/table/FlowListTable'
 import ViewHeader from '@/layout/MainLayout/ViewHeader'
+import WorkdayAgentHeader from '@/ui-component/extended/WorkdayAgentHeader'
 import ErrorBoundary from '@/ErrorBoundary'
 import { StyledPermissionButton } from '@/ui-component/button/RBACButtons'
 import TablePagination, { DEFAULT_ITEMS_PER_PAGE } from '@/ui-component/pagination/TablePagination'
@@ -167,12 +168,10 @@ const Agentflows = () => {
                 <ErrorBoundary error={error} />
             ) : (
                 <Stack flexDirection='column' sx={{ gap: 3 }}>
-                    <ViewHeader
+                    <WorkdayAgentHeader
                         onSearchChange={onSearchChange}
                         search={true}
                         searchPlaceholder='Search Name or Category'
-                        title='Agentflows'
-                        description='Multi-agent systems, workflow orchestration'
                     >
                         <ToggleButtonGroup
                             sx={{ borderRadius: 2, maxHeight: 40 }}
@@ -249,7 +248,7 @@ const Agentflows = () => {
                         >
                             Add New
                         </StyledPermissionButton>
-                    </ViewHeader>
+                    </WorkdayAgentHeader>
                     {!isLoading && total > 0 && (
                         <>
                             {!view || view === 'card' ? (
