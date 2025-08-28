@@ -275,7 +275,7 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
         const foundIcon = AGENTFLOW_ICONS.find((icon) => icon.name === node.name)
 
         if (!foundIcon) return null
-        return <foundIcon.icon size={30} color={node.color} />
+        return <foundIcon.icon size={30} color={foundIcon.color} />
     }
 
     useEffect(() => {
@@ -558,7 +558,7 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
                                                                             }}
                                                                         >
                                                                             <ListItem alignItems='center'>
-                                                                                {node.color && !node.icon ? (
+                                                                                {(node.color && !node.icon) || AGENTFLOW_ICONS.find(icon => icon.name === node.name) ? (
                                                                                     <ListItemAvatar>
                                                                                         <div
                                                                                             style={{
