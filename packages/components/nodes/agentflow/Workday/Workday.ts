@@ -59,7 +59,7 @@ class WorkdayAgentGateway_Agentflow implements INode {
         this.description = 'Gateway for Workday API requests with specialized handling'
         this.baseClasses = [this.type]
         this.color = '#0f2e66'
-        this.icon = 'workday-logo-no-blue-bg.png'
+        this.icon = 'workday.png'
         this.credential = {
             label: 'Workday Credential',
             name: 'credential',
